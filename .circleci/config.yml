@@ -6,7 +6,7 @@ orbs:
 executors:
   golang:
     docker:
-      - image: cimg/go:stable
+      - image: cimg/go:1.17
 
 commands:
   build_and_zip:
