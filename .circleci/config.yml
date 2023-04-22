@@ -1,0 +1,27 @@
+version: 2
+jobs:
+  build-deploy:
+    docker:
+      - image: circleci/golang
+    steps:
+      - checkout
+      - run: GOOS=linux go build main.go
+      - run: zip main.zip main
+      - run: |
+          sudo apt-get update
+          sudo apt-get install -y python3-pip
+          sudo pip3 install awscli --upgrade
+          aws configure set aws_access_key_id "${AWS_ACCESS_KEY}"
+          aws configure set aws_secret_access_key "${AWS_SECRET_KEY}"
+          aws configure set region "${AWS_REGION}"
+          aws lambda update-function-code --function-name "${AWS_LAMBDA_FUNCTION_NAME}" --zip-file fileb://main.zip
+
+workflows:
+  version: 2
+  build-and-deploy:
+    jobs:
+      - build-deploy:
+          filters:
+            branches:
+              only:
+                - main
